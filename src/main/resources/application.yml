@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+
+
+jwt:
+  secret: secretkey123
+
+
+spring:
+  data:
+    mongodb:
+      database: test_promerica
+      host: testmongodb
+      port: 27017

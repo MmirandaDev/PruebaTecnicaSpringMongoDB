@@ -1,0 +1,14 @@
+version: "3"
+services:
+  testmongodb:
+    image: mongo:latest
+    container_name: "testmongodb"
+    ports:
+      - 27017:27017
+  test-promerica:
+    image: test-promerica:1.0
+    container_name: test-promerica
+    ports:
+      - 8080:8080
+    links:
+      - testmongodb
