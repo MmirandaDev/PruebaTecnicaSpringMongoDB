@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @RestController
@@ -28,36 +31,48 @@ public class DocumentController implements IDocumentController {
     private SequenceGeneratorService sequenceGeneratorService;
 
     @Override
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<List<Documents>> getAll() {
         try {
-            return new ResponseEntity<>(documentService.getAll(), HttpStatus.OK);
+            List<Documents> documentsList = documentService.getAll();
+            if (documentsList.isEmpty())
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+            return new ResponseEntity<>(documentsList, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getCause().toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.warning(e.getCause().toString());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    public Documents find(Long id) {
-        return documentService.get(id);
+    public ResponseEntity<Documents> find(@PathVariable Long id) {
+        try {
+            Optional<Documents> document = documentService.getDocumentById(id);
+            return document.map(obj -> new ResponseEntity<>(obj, HttpStatus.OK))
+                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT));
+
+        } catch (Exception e) {
+            log.warning(e.getCause().toString());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
-    public ResponseEntity<?> save(DocumentRequest document) {
+    public ResponseEntity<Documents> save(DocumentRequest document) {
         try {
             ModelMapper modelMapper = new ModelMapper();
             Documents obj = modelMapper.map(document, Documents.class);
-
             obj.setId(sequenceGeneratorService.getSequenceNumber(Documents.SEQUENCE_NAME));
             documentService.save(obj);
             return new ResponseEntity<>(obj, HttpStatus.OK);
         } catch (Exception e) {
             log.warning(e.getCause().toString());
-            return new ResponseEntity<>(e.getCause().toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    public ResponseEntity<?> update(DocumentRequest document) {
+    public ResponseEntity<Documents> update(DocumentRequest document) {
         try {
             ModelMapper modelMapper = new ModelMapper();
             Documents obj = modelMapper.map(document, Documents.class);
@@ -65,12 +80,12 @@ public class DocumentController implements IDocumentController {
             return new ResponseEntity<>(obj, HttpStatus.OK);
         } catch (Exception e) {
             log.warning(e.getCause().toString());
-            return new ResponseEntity<>(e.getCause().toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    public ResponseEntity<?> delete(Long id) {
+    public ResponseEntity<Documents> delete(Long id) {
         try {
             Documents obj = documentService.get(id);
             if (obj != null) {
@@ -81,7 +96,8 @@ public class DocumentController implements IDocumentController {
             }
 
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getCause().toString(), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.warning(e.getCause().toString());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

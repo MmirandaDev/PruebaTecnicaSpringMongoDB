@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class DocumentServiceImpl extends GenericServiceImpl<Documents, Long> implements DocumentService {
@@ -19,5 +21,10 @@ public class DocumentServiceImpl extends GenericServiceImpl<Documents, Long> imp
     @Override
     public CrudRepository<Documents, Long> getDao() {
         return documentRepository;
+    }
+
+    @Override
+    public Optional<Documents> getDocumentById(Long id) {
+        return documentRepository.findById(id);
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @Validated
 @Component
@@ -17,26 +19,26 @@ public interface IDocumentController {
     @GetMapping(path = "/all", produces = "application/json")
     @ResponseStatus(code = HttpStatus.OK)
     @ResponseBody
-    ResponseEntity<?> getAll();
+    ResponseEntity<List<Documents>> getAll();
 
     @GetMapping(path = "/find/{id}", produces = "application/json")
     @ResponseStatus(code = HttpStatus.OK)
     @ResponseBody
-    Documents find(@PathVariable Long id);
+    ResponseEntity<Documents> find(@PathVariable Long id);
 
     @PostMapping(value = "/save", produces = "application/json")
     @ResponseStatus(code = HttpStatus.OK)
     @ResponseBody
-    ResponseEntity<?> save(@RequestBody DocumentRequest request);
+    ResponseEntity<Documents> save(@RequestBody DocumentRequest request);
 
     @PutMapping(value = "/update", produces = "application/json")
     @ResponseStatus(code = HttpStatus.OK)
     @ResponseBody
-    ResponseEntity<?> update(@RequestBody DocumentRequest request);
+    ResponseEntity<Documents> update(@RequestBody DocumentRequest request);
 
 
     @DeleteMapping(value = "/delete/{id}", produces = "application/json")
     @ResponseStatus(code = HttpStatus.OK)
     @ResponseBody
-    ResponseEntity<?> delete(@PathVariable Long id);
+    ResponseEntity<Documents> delete(@PathVariable Long id);
 }
